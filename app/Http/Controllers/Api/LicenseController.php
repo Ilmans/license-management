@@ -17,7 +17,7 @@ class LicenseController extends Controller
        $validator = Validator::make($request->all(),[
             'product_id' => ['required',''],
             'licensekey' => ['required','min:10'],
-            'customer_email' => ['required','email'],
+            'customer_email' => ['required','email','unique:licenses' ],
             'customer_name' => ['required','min:4'],
             'customer_mobile' => ['required'],
             'type' => ['required','in:lifetime,trial,duration'], 
@@ -33,6 +33,8 @@ class LicenseController extends Controller
              ],
          ],Response::HTTP_BAD_REQUEST);
      }
+
+
 
      License::create($request->all());
      return response()->json([
@@ -64,51 +66,89 @@ class LicenseController extends Controller
             ],Response::HTTP_BAD_REQUEST);
         }
 
-      $check = License::where('customer_email',$request->email);
-     if($check->count() > 0){
-         $data = $check->first();
-        $licensekey = $data->licensekey;
-        if($request->licensekey === $licensekey){
-            if($data->host === null){
-                $data->host = $request->host;
-            } else {
-                $host = explode(',',$data->host);
-                if(count($host) >= 3){
-                    return response()->json([
-                        'status' => Response::HTTP_BAD_REQUEST ,
-                        'data' => [
-                            'message' => 'Your Host / domain already limited,contact admin to add!',
-                        ],
-                    ]);
-                }
-                $data->host = $data->host.','.$request->host;
-            }
+      $check = License::whereCustomerEmail($request->email)->first();
 
-            $data->save();
+
+
+    
+      if(!$check){
+        return response()->json([
+            'status' => Response::HTTP_BAD_REQUEST ,
+            'data' => [
+                'message' => 'Your email not match with your license',
+            ],
+        ]);
+      }
+
+      if($check->licensekey !== $request->licensekey){
+        return response()->json([
+            'status' => Response::HTTP_BAD_REQUEST ,
+            'data' => [
+                'message' => 'Your email not match with your license 2',
+            ],
+        ]);
+      }
+
+      if($check->host === '*'){
+        return response()->json([
+            'status' => Response::HTTP_ACCEPTED ,
+            'data' => [
+                'message' => 'Your host successfully added to this license',
+                'new_host' => $request->host,
+                'all_host' => 'unlimited'
+            ],
+        ]);
+      }
+
+      if($check->host === null){
+          $check->host = $request->host;
+          $check->save();
+          return response()->json([
+            'status' => Response::HTTP_ACCEPTED ,
+            'data' => [
+                'message' => 'Your host successfully added to this license',
+                'new_host' => $request->host,
+                'all_host' => $check->host
+            ],
+        ]);
+      } else {
+
+        $host = explode(',',$check->host);
+       
+
+        if(in_array($request->host,$host)){
             return response()->json([
                 'status' => Response::HTTP_ACCEPTED ,
                 'data' => [
                     'message' => 'Your host successfully added to this license',
                     'new_host' => $request->host,
-                    'all_host' => $data->host
+                    'all_host' => $check->host
                 ],
             ]);
-          
         }
+
+        if(count($host) >= 3){
+            return response()->json([
+                'status' => Response::HTTP_BAD_REQUEST ,
+                'data' => [
+                    'message' => 'Your Host / domain already limited,contact admin to add!',
+                ],
+            ]);
+        }
+
+        $check->host = $check->host .','.$request->host;
+        $check->save();
         return response()->json([
-            'status' => Response::HTTP_BAD_REQUEST ,
+            'status' => Response::HTTP_ACCEPTED ,
             'data' => [
-                'message' => 'Your license key not match with your email!',
+                'message' => 'Your host successfully added to this license',
+                'new_host' => $request->host,
+                'all_host' => $check->host
             ],
-        ],Response::HTTP_BAD_REQUEST);
-        
-     }
-     return response()->json([
-        'status' => Response::HTTP_BAD_REQUEST ,
-        'data' => [
-            'message' => 'Email or license are not registered!',
-        ],
-    ],Response::HTTP_BAD_REQUEST);
+        ]);
+
+      }
+
     }
 
 
@@ -117,8 +157,19 @@ class LicenseController extends Controller
         $check = License::where('licensekey',$request->licensekey);
         if($check->count() > 0){
             $data = $check->first();
+           // return $data->host;
+            if($data->host === '*'){
+                return response()->json([
+                    'status' => 200,
+                    'data' => [
+                        'message' => 'License Is Valid',
+                    ],
+                ],200);
+            }
+         //   return
             $host = explode(',',$data->host);
          //   return $request->host;
+            
             if(!in_array($request->host,$host)){
                 return response()->json([
                     'status' => Response::HTTP_UNAUTHORIZED,
