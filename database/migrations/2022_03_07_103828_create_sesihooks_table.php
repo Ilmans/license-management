@@ -17,6 +17,8 @@ class CreateSesihooksTable extends Migration
             $table->id();
             $table->string('from');
             $table->string('type');
+            $table->string('otp')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
