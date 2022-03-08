@@ -276,4 +276,21 @@ $message = [
    return json_encode($message);
 
     }
+
+
+    public function documentation(){
+
+        $templateButtons = [
+          ["index"=> 1, "urlButton"=>["displayText"=> '⭐ Documentation Link', "url"=> 'https://docwa.m-pedia.my.id']],
+         // ["index"=> 4, "quickReplyButton"=>["displayText"=> 'This is a reply, just like normal buttons!', "id" => 'id-like-buttons-message']]
+        ];
+        
+       
+      $templateMessage =[
+           "text"=> "Ketik *INFO* untuk menu lainnya / Type *INFO* for other menus.",
+           "footer"=> 'm pedia',
+           "templateButtons"=> $templateButtons
+      ];
+      return json_encode($templateMessage);
+   }
 }
