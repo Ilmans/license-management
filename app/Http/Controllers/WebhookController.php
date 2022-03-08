@@ -45,6 +45,9 @@ class WebhookController extends Controller
         if($message === 'order products'){
             return $this->reply->orderProducts();
         }
+        if($message === 'dokumentasi'){
+            return $this->reply->documentation();
+        }
       
         if(Sesihook::whereFrom($from)->count() > 0){
           
