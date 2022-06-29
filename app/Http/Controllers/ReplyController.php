@@ -81,7 +81,7 @@ public function orderProducts(){
 
      $templateButtons = [
        ["index"=> 1, "urlButton"=>["displayText"=> '⭐ Source Code!', "url"=> 'https://m-pedia.id']],
-       ["index"=> 2, "urlButton"=>["displayText"=> '⭐ Followers Sosial Media!', "url"=> 'https://smm.m-pedia.id']],
+       ["index"=> 2, "urlButton"=>["displayText"=> '⭐ Followers Sosial Media!', "url"=> 'https://mpediappob.com']],
        ["index"=> 3, "callButton"=>["displayText"=> 'Call me!', "phoneNumber"=> '+6282298859671']],
       // ["index"=> 4, "quickReplyButton"=>["displayText"=> 'This is a reply, just like normal buttons!', "id" => 'id-like-buttons-message']]
      ];
