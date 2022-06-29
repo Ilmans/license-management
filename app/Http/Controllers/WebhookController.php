@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Sesihook;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
@@ -58,7 +59,7 @@ class WebhookController extends Controller
                   return $this->processregister($from,$msg);
                 break;
                case 'verifemail':
-                Sesihook::whereFrom($from)->delete();
+             
                 if(substr($message,0,2) === '86'){
                     return $this->checkOtp($from,$message);
                 }
@@ -104,6 +105,7 @@ class WebhookController extends Controller
 
     public function checkOtp($from,$message){
            $data = Sesihook::where('from' , $from)->whereOtp($message)->first();
+           Log::info('Success initialize '. $data->email);
             if($data->count() > 0){
                $lic = License::whereCustomerEmail($data->email)->first();
                $lic->customer_mobile = $from;
@@ -112,6 +114,7 @@ class WebhookController extends Controller
 
                return $this->reply->successRegister();
             }
+           
             return json_encode(['text' => 'INVALID OTP']);
     }
 
