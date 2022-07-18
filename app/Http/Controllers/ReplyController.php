@@ -20,7 +20,7 @@ Sorry, Your number not registered in our system, if you feel you have register ,
     ';
         $message = [
             "text" => $text,
-            "footer" => "https://m-pedia.id | 6282298859671",
+            "footer" => "https://m-pedia.co.id | 6282298859671",
             "buttons" => $buttons,
            
            ];
@@ -80,7 +80,7 @@ return json_encode(['text' => $text]);
 public function orderProducts(){
 
      $templateButtons = [
-       ["index"=> 1, "urlButton"=>["displayText"=> '⭐ Source Code!', "url"=> 'https://m-pedia.id']],
+       ["index"=> 1, "urlButton"=>["displayText"=> '⭐ Source Code!', "url"=> 'https://m-pedia.co.id']],
        ["index"=> 2, "urlButton"=>["displayText"=> '⭐ Followers Sosial Media!', "url"=> 'https://mpediappob.com']],
        ["index"=> 3, "callButton"=>["displayText"=> 'Call me!', "phoneNumber"=> '+6282298859671']],
       // ["index"=> 4, "quickReplyButton"=>["displayText"=> 'This is a reply, just like normal buttons!', "id" => 'id-like-buttons-message']]
@@ -126,7 +126,7 @@ public function orderProducts(){
     $msg = [
     "text" => $text,
     "title" => "GOOD!",
-    "footer" => "https://m-pedia.id | 6282298859671",
+    "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttonText" => "Lists Menu",
     "sections" => $sections
     ];
@@ -158,7 +158,7 @@ public function checkLicense($lic){
     $msg = [
         "text" => $text,
         "title" => "LICENSE INFORMATION",
-        "footer" => "https://m-pedia.id | 6282298859671",
+        "footer" => "https://m-pedia.co.id | 6282298859671",
         "buttonText" => "Lists Menu",
         "sections" => $sections
         ];
@@ -210,7 +210,7 @@ Success Activate domain *'. $msg.'* Tap check license to view your license infor
 ';
 $message = [
     "text" => $text,
-    "footer" => "https://m-pedia.id | 6282298859671",
+    "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
    
    ];
@@ -230,7 +230,7 @@ Success, Done register and the number has linked.
 ';
 $message = [
     "text" => $text,
-    "footer" => "https://m-pedia.id | 6282298859671",
+    "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
    
    ];
@@ -250,7 +250,7 @@ Domain *'. $msg.'* Deleted,  Tap check license to view your license information.
 ';
 $message = [
     "text" => $text,
-    "footer" => "https://m-pedia.id | 6282298859671",
+    "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
    
    ];
@@ -269,7 +269,7 @@ Domain *'. $msg.'* Not registered in your license,  Deactivate canceled.
 ';
 $message = [
     "text" => $text,
-    "footer" => "https://m-pedia.id | 6282298859671",
+    "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
    
    ];
