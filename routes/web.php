@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DownloadFileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\WebhookController;
@@ -27,6 +28,8 @@ Route::get('/notRegistered', [ReplyController::class, 'notRegistered']);
 Route::get('/processregister', [WebhookController::class, 'processregister']);
 
 Route::get('postuser', [PostController::class, 'index']);
-Route::get('/invalids' , function(){
+Route::get('/invalids' , function() {
     return view('invalid');
 });
+
+
