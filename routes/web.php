@@ -27,3 +27,6 @@ Route::get('/notRegistered', [ReplyController::class, 'notRegistered']);
 Route::get('/processregister', [WebhookController::class, 'processregister']);
 
 Route::get('postuser', [PostController::class, 'index']);
+Route::get('/invalid' , function(){
+    return view('invalid');
+});
