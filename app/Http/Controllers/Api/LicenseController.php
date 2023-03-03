@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\License;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 class LicenseController extends Controller
 {
@@ -24,12 +25,7 @@ class LicenseController extends Controller
             'purchase_code' => ['required'],
         ]);
 
-     if($validator->fails()){
-         return response()->json([
-             'status' => Response::HTTP_BAD_REQUEST ,
-             'data' => [
-                 'message' => 'Something wrong in your request',
-                 'errors' => $validator->errors(),
+     if($validator->fails()){ return response()->json(['status' => Response::HTTP_BAD_REQUEST , 'data' => [ 'message' => 'Something wrong in your request','errors' => $validator->errors(),
              ],
          ],Response::HTTP_BAD_REQUEST);
      }
@@ -48,151 +44,327 @@ class LicenseController extends Controller
 
 
     }
+    public function activate(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'licensekey' => ['required'],
+        'email' => ['required'],
+        'host' => ['required'],
+    ]);
 
-    public function activate(Request $request){
-       
-        $validator = Validator::make($request->all(),[
-            'licensekey' => ['required'],
-            'email' => ['required'], 
-            'host' => ['required'],
-        ]);
-        if($validator->fails()){
-            return response()->json([
-                'status' => Response::HTTP_BAD_REQUEST ,
-                'data' => [
-                    'message' => 'Something wrong in your request',
-                    'errors' => $validator->errors(),
-                ],
-            ],Response::HTTP_BAD_REQUEST);
-        }
-
-      $check = License::whereCustomerEmail($request->email)->first();
-
-
-
-    
-      if(!$check){
+    if ($validator->fails()) {
         return response()->json([
-            'status' => Response::HTTP_BAD_REQUEST ,
+            'status' => Response::HTTP_BAD_REQUEST,
+            'data' => [
+                'message' => 'Something wrong in your request',
+                'errors' => $validator->errors(),
+            ],
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
+    $cacheKey = 'license:' . $request->email;
+  
+    $check = Cache::remember($cacheKey, 3600 , function () use ($request) {
+        return License::whereCustomerEmail($request->email)->first();
+    });
+
+    if (!$check) {
+        return response()->json([
+            'status' => Response::HTTP_BAD_REQUEST,
             'data' => [
                 'message' => 'Your email not match with your license',
             ],
         ]);
-      }
+    }
 
-      if($check->licensekey !== $request->licensekey){
+    if ($check->licensekey !== $request->licensekey) {
         return response()->json([
-            'status' => Response::HTTP_BAD_REQUEST ,
+            'status' => Response::HTTP_BAD_REQUEST,
             'data' => [
                 'message' => 'Your email not match with your license 2',
             ],
         ]);
-      }
+    }
 
-      if($check->host === '*'){
+    if ($check->host === '*') {
         return response()->json([
-            'status' => Response::HTTP_ACCEPTED ,
+            'status' => Response::HTTP_ACCEPTED,
             'data' => [
                 'message' => 'Your host successfully added to this license',
                 'new_host' => $request->host,
-                'all_host' => 'unlimited'
+                'all_host' => 'unlimited',
             ],
         ]);
-      }
+    }
 
-      if($check->host === null){
-          $check->host = $request->host;
-          $check->save();
-          return response()->json([
-            'status' => Response::HTTP_ACCEPTED ,
+    $cachekeyusinglicense =   'license:'.$request->licensekey;
+    if ($check->host === null) {
+        $check->host = $request->host;
+        $check->save();
+        Cache::forget($cachekeyusinglicense);
+        Cache::forget($cacheKey);
+        return response()->json([
+            'status' => Response::HTTP_ACCEPTED,
             'data' => [
                 'message' => 'Your host successfully added to this license',
                 'new_host' => $request->host,
-                'all_host' => $check->host
+                'all_host' => $check->host,
             ],
         ]);
-      } else {
+    } else {
+        $host = explode(',', $check->host);
 
-        $host = explode(',',$check->host);
-       
-
-        if(in_array($request->host,$host)){
+        if (in_array($request->host, $host)) {
             return response()->json([
-                'status' => Response::HTTP_ACCEPTED ,
+                'status' => Response::HTTP_ACCEPTED,
                 'data' => [
                     'message' => 'Your host successfully added to this license',
                     'new_host' => $request->host,
-                    'all_host' => $check->host
+                    'all_host' => $check->host,
                 ],
             ]);
         }
 
-        if(count($host) >= 3){
+        if (count($host) >= 3) {
             return response()->json([
-                'status' => Response::HTTP_BAD_REQUEST ,
+                'status' => Response::HTTP_BAD_REQUEST,
                 'data' => [
                     'message' => 'Your Host / domain already limited,contact admin to add!',
                 ],
             ]);
         }
 
-        $check->host = $check->host .','.$request->host;
+        $check->host = $check->host . ',' . $request->host;
         $check->save();
+        Cache::forget($cachekeyusinglicense);
+        Cache::forget($cacheKey);
+
         return response()->json([
-            'status' => Response::HTTP_ACCEPTED ,
+            'status' => Response::HTTP_ACCEPTED,
             'data' => [
                 'message' => 'Your host successfully added to this license',
                 'new_host' => $request->host,
-                'all_host' => $check->host
+                'all_host' => $check->host,
             ],
         ]);
-
-      }
-
     }
+}
+
+
+    // public function activate(Request $request){
+       
+    //     $validator = Validator::make($request->all(),[ 'licensekey' => ['required'],  'email' => ['required'],   'host' => ['required'],  ]);
+    //     if($validator->fails()){
+    //         return response()->json(['status' => Response::HTTP_BAD_REQUEST ,'data' => [ 'message' => 'Something wrong in your request', 'errors' => $validator->errors(), ],
+    //         ],Response::HTTP_BAD_REQUEST);
+    //     }
+    
+    //    $check = License::whereCustomerEmail($request->email)->first();
+    //    if(!$check){
+    //      return response()->json(['status' => Response::HTTP_BAD_REQUEST ,'data' => [ 'message' => 'Your email not match with your license', ], ]);
+    //    }
+
+    //   if($check->licensekey !== $request->licensekey){
+    //     return response()->json([
+    //         'status' => Response::HTTP_BAD_REQUEST ,
+    //         'data' => [
+    //             'message' => 'Your email not match with your license 2',
+    //         ],
+    //     ]);
+    //   }
+
+    //   if($check->host === '*'){
+    //     return response()->json([
+    //         'status' => Response::HTTP_ACCEPTED ,
+    //         'data' => [
+    //             'message' => 'Your host successfully added to this license',
+    //             'new_host' => $request->host,
+    //             'all_host' => 'unlimited'
+    //         ],
+    //     ]);
+    //   }
+
+    //   if($check->host === null){
+    //       $check->host = $request->host;
+    //       $check->save();
+    //       return response()->json([
+    //         'status' => Response::HTTP_ACCEPTED ,
+    //         'data' => [
+    //             'message' => 'Your host successfully added to this license',
+    //             'new_host' => $request->host,
+    //             'all_host' => $check->host
+    //         ],
+    //     ]);
+    //   } else {
+
+    //     $host = explode(',',$check->host);
+       
+
+    //     if(in_array($request->host,$host)){
+    //         return response()->json([
+    //             'status' => Response::HTTP_ACCEPTED ,
+    //             'data' => [
+    //                 'message' => 'Your host successfully added to this license',
+    //                 'new_host' => $request->host,
+    //                 'all_host' => $check->host
+    //             ],
+    //         ]);
+    //     }
+
+    //     if(count($host) >= 3){
+    //         return response()->json([
+    //             'status' => Response::HTTP_BAD_REQUEST ,
+    //             'data' => [
+    //                 'message' => 'Your Host / domain already limited,contact admin to add!',
+    //             ],
+    //         ]);
+    //     }
+
+    //     $check->host = $check->host .','.$request->host;
+    //     $check->save();
+
+    //     return response()->json([
+    //         'status' => Response::HTTP_ACCEPTED ,
+    //         'data' => [
+    //             'message' => 'Your host successfully added to this license',
+    //             'new_host' => $request->host,
+    //             'all_host' => $check->host
+    //         ],
+    //     ]);
+
+    //   }
+
+    // }
 
 
     public function check(Request $request){
 
+    $cache_key = 'license:'.$request->licensekey;
+
+    $data = Cache::get($cache_key);
+
+    if(!$data){
         $check = License::where('licensekey',$request->licensekey);
+
         if($check->count() > 0){
             $data = $check->first();
-           // return $data->host;
+
             if($data->host === '*'){
-                return response()->json([
+                $response = response()->json([
                     'status' => 200,
                     'data' => [
                         'message' => 'License Is Valid',
                     ],
                 ],200);
             }
-         //   return
-            $host = explode(',',$data->host);
-         //   return $request->host;
+            else{
+                $host = explode(',',$data->host);
             
-            if(!in_array($request->host,$host)){
-                return response()->json([
-                    'status' => Response::HTTP_UNAUTHORIZED,
-                    'data' => [
-                        'message' => 'Invalid license',
-                    ],
-                ],Response::HTTP_UNAUTHORIZED);
+                if(!in_array($request->host,$host)){
+                    $response = response()->json([
+                        'status' => Response::HTTP_UNAUTHORIZED,
+                        'data' => [
+                            'message' => 'Invalid license',
+                        ],
+                    ],Response::HTTP_UNAUTHORIZED);
+                }
+                else{
+                    $response = response()->json([
+                        'status' => 200,
+                        'data' => [
+                            'message' => 'License Is Valid',
+                        ],
+                    ],200);
+                }
             }
-            return response()->json([
+
+            Cache::put($cache_key, $data, 3600); //Simpan data pada cache selama 1 jam
+        }
+        else{
+            $response = response()->json([
+                'status' => Response::HTTP_BAD_REQUEST ,
+                'data' => [
+                    'message' => 'License Not Valid!',
+                ],
+            ],Response::HTTP_BAD_REQUEST);
+        }
+    }
+    else{
+        if($data->host === '*'){
+            $response = response()->json([
                 'status' => 200,
                 'data' => [
                     'message' => 'License Is Valid',
                 ],
             ],200);
         }
-
-        return response()->json([
-            'status' => Response::HTTP_BAD_REQUEST ,
-            'data' => [
-                'message' => 'License Not Valid!',
-              
-            ],
-        ],Response::HTTP_BAD_REQUEST);
+        else{
+            $host = explode(',',$data->host);
+        
+            if(!in_array($request->host,$host)){
+                $response = response()->json([
+                    'status' => Response::HTTP_UNAUTHORIZED,
+                    'data' => [
+                        'message' => 'Invalid license',
+                    ],
+                ],Response::HTTP_UNAUTHORIZED);
+            }
+            else{
+                $response = response()->json([
+                    'status' => 200,
+                    'data' => [
+                        'message' => 'License Is Valid',
+                    ],
+                ],200);
+            }
+        }
     }
+
+    return $response;
+}
+
+
+    // public function check(Request $request){
+
+    //     $check = License::where('licensekey',$request->licensekey);
+    //     if($check->count() > 0){
+    //         $data = $check->first();
+    //        // return $data->host;
+    //         if($data->host === '*'){
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'data' => [
+    //                     'message' => 'License Is Valid',
+    //                 ],
+    //             ],200);
+    //         }
+    //      //   return
+    //         $host = explode(',',$data->host);
+    //      //   return $request->host;
+            
+    //         if(!in_array($request->host,$host)){
+    //             return response()->json([
+    //                 'status' => Response::HTTP_UNAUTHORIZED,
+    //                 'data' => [
+    //                     'message' => 'Invalid license',
+    //                 ],
+    //             ],Response::HTTP_UNAUTHORIZED);
+    //         }
+    //         return response()->json([
+    //             'status' => 200,
+    //             'data' => [
+    //                 'message' => 'License Is Valid',
+    //             ],
+    //         ],200);
+    //     }
+
+    //     return response()->json([
+    //         'status' => Response::HTTP_BAD_REQUEST ,
+    //         'data' => [
+    //             'message' => 'License Not Valid!',
+              
+    //         ],
+    //     ],Response::HTTP_BAD_REQUEST);
+    // }
 
 }
