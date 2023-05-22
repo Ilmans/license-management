@@ -22,6 +22,7 @@ Sorry, Your number not registered in our system, if you feel you have register ,
             "text" => $text,
             "footer" => "https://m-pedia.co.id | 6282298859671",
             "buttons" => $buttons,
+            "viewOnce" => true,
            
            ];
            return json_encode($message);
@@ -128,7 +129,8 @@ public function orderProducts(){
     "title" => "GOOD!",
     "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttonText" => "Lists Menu",
-    "sections" => $sections
+    "sections" => $sections,
+    "viewOnce" => true,
     ];
     return json_encode($msg);
     }
@@ -160,7 +162,8 @@ public function checkLicense($lic){
         "title" => "LICENSE INFORMATION",
         "footer" => "https://m-pedia.co.id | 6282298859671",
         "buttonText" => "Lists Menu",
-        "sections" => $sections
+        "sections" => $sections,
+          "viewOnce" => true,
         ];
         return json_encode($msg);
     
@@ -212,6 +215,7 @@ $message = [
     "text" => $text,
     "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
+      "viewOnce" => true,
    
    ];
    return json_encode($message);
@@ -232,6 +236,7 @@ $message = [
     "text" => $text,
     "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
+      "viewOnce" => true,
    
    ];
    return json_encode($message);
@@ -252,6 +257,7 @@ $message = [
     "text" => $text,
     "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
+      "viewOnce" => true,
    
    ];
    return json_encode($message);
@@ -271,6 +277,7 @@ $message = [
     "text" => $text,
     "footer" => "https://m-pedia.co.id | 6282298859671",
     "buttons" => $buttons,
+      "viewOnce" => true,
    
    ];
    return json_encode($message);
@@ -289,7 +296,8 @@ $message = [
       $templateMessage =[
            "text"=> "Ketik *INFO* untuk menu lainnya / Type *INFO* for other menus.",
            "footer"=> 'm pedia',
-           "templateButtons"=> $templateButtons
+           "templateButtons"=> $templateButtons,
+             "viewOnce" => true,
       ];
       return json_encode($templateMessage);
    }

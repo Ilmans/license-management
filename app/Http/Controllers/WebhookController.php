@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\WebHook;
+
 use App\Mail\OtpRegister;
 use App\Models\License;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Sesihook;
 use Illuminate\Support\Facades\Mail;
