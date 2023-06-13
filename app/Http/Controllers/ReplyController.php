@@ -110,6 +110,7 @@ public function orderProducts(){
                "rows" => [
               // ["title" => "Info Account ", "rowId" => "l4", "description" => "Check your account info"],
                ["title" => "Order Products", "rowId" => "l5", "description" => "Many products are available for you!"],
+                  ["title" => "Upgrade Max Domain", "rowId" => "l3", "description" => "Upgrade your maximal domain license"],
                 ]
             ]
             
@@ -142,6 +143,7 @@ public function checkLicense($lic){
            "rows" => [
            ["title" => "Activate Domain", "rowId" => "l2", "description" => "Input domain to license"],
            ["title" => "Deactivate Domain", "rowId" => "l3", "description" => "delete domain from license"],
+           ["title" => "Upgrade Max Domain", "rowId" => "l3", "description" => "Upgrade your maximal domain license"],
         ]
            ]
         
@@ -155,6 +157,7 @@ public function checkLicense($lic){
 *License Key* : '. $lic->licensekey .'
 *Type* : '. $lic->type .'
 *Host* : '. $host .'
+*Max Domain* : '. $lic->max_links .'
 ';
     
     $msg = [
@@ -184,9 +187,9 @@ return ['text' => $text];
     public function maximalDomain($licensekey){
         $text =
         '
-License kamu *'.$licensekey.'* Sudah terbatas (3 subdomain/domain), silahkan non aktifkan salah satu terlebih dahulu.
+License kamu *'.$licensekey.'* Sudah terbatas , silahkan non aktifkan salah satu terlebih dahulu.
 ---------------------------------
-Your License *'.$licensekey.'* is limited (3 subdomain/domain),please deactive one of them first.
+Your License *'.$licensekey.'* is limited ,please deactive one of them first.
         ';  
         return ['text' => $text];
     }

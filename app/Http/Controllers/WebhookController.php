@@ -42,6 +42,9 @@ class WebhookController extends Controller
         if($message === 'deactivate domain'){
             return $this->deactivateDomain($from);
         }
+        if($message === 'upgrade max domain'){
+            return $this->upgradeDomain($from);
+        }
         if($message === 'order products'){
             return $this->reply->orderProducts();
         }
@@ -130,7 +133,7 @@ class WebhookController extends Controller
         }
         $ex = explode(',',$lic->host);
         $total = count($ex);
-        if($total >= 3){
+        if($total >= $lic->max_links){
             return $this->reply->maximalDomain($lic->licensekey);
         }
         Sesihook::create([
@@ -198,6 +201,18 @@ Write which you want to deactivate.
         } 
         return $this->reply->invalidDeactivateDomain($msg);
 
+    }
+
+    public function upgradeDomain($from) {
+$codeUnik = rand(111,999);
+$text =
+"*Harga* : Rp 120.000 / domain
+Jika ingin melanjutkan silahkan transfer
+ke rekening berikut sesuai *jumlah domain + kode unik*
+*Rekening* : 1671481688 an Ilman Sunanuddin
+*Kode Unik* : $codeUnik
+";
+        return json_encode(["text" => $text]);
     }
 
     
